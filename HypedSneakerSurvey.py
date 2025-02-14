@@ -1,5 +1,14 @@
 import streamlit as st
 from math import floor, ceil
+from streamlit_gsheets import GSheetsConnection
+import pandas as pd
+
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+existing_data = conn.read(worksheet="ResponseTable", usecols=list(range(3)), ttl=5)
+
+# st.dataframe(existing_data)
+
 def calc_new_price(low_value, high_value):
     tenthousands_low = floor(low_value / 10000) * 10000
     tenthousands_high = floor(high_value / 10000) * 10000
@@ -79,6 +88,10 @@ if "buy_value" not in st.session_state:
     st.session_state["buy_value"] = None
 if "not_buy_value" not in st.session_state:
     st.session_state["not_buy_value"] = None
+if "store_buy_value" not in st.session_state:
+    st.session_state["store_buy_value"] = None
+if "store_not_buy_value" not in st.session_state:
+    st.session_state["store_not_buy_value"] = None
 if "check_price" not in st.session_state:
     st.session_state["check_price"] = None
 if "check_price_answer" not in st.session_state:
@@ -89,12 +102,14 @@ with st.form("Get Buy Value"):
     buy_value_submitted = st.form_submit_button("Submit Buy Value")
     if buy_value_submitted:
         st.session_state["buy_value"] = buy_value
+        st.session_state["store_buy_value"] = buy_value
 if st.session_state["buy_value"] is not None:
     with st.form("Get Not Buy Value"):
         not_buy_value = st.number_input("At what price you will definitely NOT buy these sneakers?*", min_value=0, max_value=100000,step=1)
         not_buy_value_submitted = st.form_submit_button("Submit Not Buy Value")
     if not_buy_value_submitted:
         st.session_state["not_buy_value"] = not_buy_value
+        st.session_state["store_not_buy_value"] = not_buy_value
 if st.session_state["not_buy_value"] is not None and st.session_state["buy_value"] is not None:
     # st.write("A")
     if st.session_state["not_buy_value"] <= st.session_state["buy_value"] and st.session_state["check_price"] is None:
@@ -130,6 +145,15 @@ if st.session_state["not_buy_value"] is not None and st.session_state["buy_value
             st.write("final price = ", final_price)
             submit = st.button("Submit your results")
             if submit:
+                result_data = pd.DataFrame([
+                    {
+                        "buy price": st.session_state.store_buy_value,
+                        "not buy price": st.session_state.store_not_buy_value,
+                        "final price": final_price,
+                    }
+                ])
+                updated_data = pd.concat([existing_data, result_data], ignore_index=True)
+                conn.update(worksheet="ResponseTable", data=updated_data)
                 st.write("Thank you for taking the survey")
 
 
