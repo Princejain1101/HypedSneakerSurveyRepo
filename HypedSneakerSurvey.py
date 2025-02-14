@@ -123,6 +123,8 @@ if st.session_state["not_buy_value"] is not None and st.session_state["buy_value
             # st.write("C")
             st.session_state["buy_value"] = None
             st.session_state["not_buy_value"] = None
+            st.session_state["store_buy_value"] = None
+            st.session_state["store_not_buy_value"] = None
             st.rerun()
     else:
         st.write("Your new Range is: " + str(st.session_state.buy_value) + " -> " + str(st.session_state.not_buy_value))
