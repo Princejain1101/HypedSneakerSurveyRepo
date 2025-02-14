@@ -96,20 +96,24 @@ if "check_price" not in st.session_state:
     st.session_state["check_price"] = None
 if "check_price_answer" not in st.session_state:
     st.session_state["check_price_answer"] = None
-
-with st.form("Get Buy Value"):
-    buy_value = st.number_input("At what price you will definitely buy these sneakers?*", min_value=0, max_value=100000, step=1)
-    buy_value_submitted = st.form_submit_button("Submit Buy Value")
-    if buy_value_submitted:
-        st.session_state["buy_value"] = buy_value
-        st.session_state["store_buy_value"] = buy_value
-if st.session_state["buy_value"] is not None:
-    with st.form("Get Not Buy Value"):
+buy_value_placeholder = st.empty()
+if st.session_state.store_buy_value is None:
+    with buy_value_placeholder.form("Get Buy Value"):
+        buy_value = st.number_input("At what price you will definitely buy these sneakers?*", min_value=0, max_value=100000, step=1)
+        buy_value_submitted = st.form_submit_button("Submit Buy Value")
+        if buy_value_submitted:
+            st.session_state["buy_value"] = buy_value
+            st.session_state["store_buy_value"] = buy_value
+            buy_value_placeholder.empty()
+not_buy_value_placeholder = st.empty()
+if st.session_state["buy_value"] is not None and st.session_state.store_not_buy_value is None:
+    with not_buy_value_placeholder.form("Get Not Buy Value"):
         not_buy_value = st.number_input("At what price you will definitely NOT buy these sneakers?*", min_value=0, max_value=100000,step=1)
         not_buy_value_submitted = st.form_submit_button("Submit Not Buy Value")
     if not_buy_value_submitted:
         st.session_state["not_buy_value"] = not_buy_value
         st.session_state["store_not_buy_value"] = not_buy_value
+        not_buy_value_placeholder.empty()
 if st.session_state["not_buy_value"] is not None and st.session_state["buy_value"] is not None:
     # st.write("A")
     if st.session_state["not_buy_value"] <= st.session_state["buy_value"] and st.session_state["check_price"] is None:
