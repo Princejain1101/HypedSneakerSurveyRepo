@@ -1,12 +1,12 @@
 import streamlit as st
 
-if "favorite_brand" not in st.session_state:
-    st.session_state["favorite_brand"] = None
-if "second_favorite_brand" not in st.session_state:
-    st.session_state["second_favorite_brand"] = None
-if "final_favorite_brand_list" not in st.session_state:
-    st.session_state["final_favorite_brand_list"] = None
 def favorite_brand_api():
+    if "favorite_brand" not in st.session_state:
+        st.session_state["favorite_brand"] = None
+    if "second_favorite_brand" not in st.session_state:
+        st.session_state["second_favorite_brand"] = None
+    if "final_favorite_brand_list" not in st.session_state:
+        st.session_state["final_favorite_brand_list"] = None
     brand_list = ["Adidas", "Hoka", "Soloman", "New Balance", "On", "Converse", "Reebok", "Nike", "Yeezy", "Vans",
                   "Asics", "None of the above"]
     if st.session_state["favorite_brand"] is None:
