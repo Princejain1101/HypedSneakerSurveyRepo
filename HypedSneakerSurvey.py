@@ -8,7 +8,7 @@ from price_calculations import calc_new_price, set_new_price, update_buy_not_buy
 from datetime import datetime
 import streamlit.components.v1 as components
 from indifferencesurvey import indifference_survey
-from favorite_brand import favorite_brand
+from favorite_brand import favorite_brand_api
 
 sneaker1nolabel = "airforce1-nolabel.png"
 sneaker2nolabel = "airforce1ambush-nolabel.png"
@@ -272,7 +272,7 @@ if st.session_state["exit_survey"] is None:
             #             st.session_state["maximum_value"] = None
             #             st.rerun()
     if st.session_state["run_indifference_survey"] is not None and st.session_state["get_brands"] is None:
-        brands = favorite_brand()
+        brands = favorite_brand_api()
         st.session_state["get_brands"] = brands
     if st.session_state["get_brands"] is not None:
         st.session_state["exit_survey"] = True
