@@ -9,6 +9,7 @@ from datetime import datetime
 import streamlit.components.v1 as components
 from indifferencesurvey import indifference_survey
 from favorite_brand import favorite_brand_api
+st.set_page_config(layout="wide")
 
 sneaker1nolabel = "airforce1-nolabel.png"
 sneaker2nolabel = "airforce1ambush-nolabel.png"
@@ -23,7 +24,6 @@ setTimeout(function() {
 </script>
 """
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
-
 def check_email(email):
     if email is "": return None
     return True if re.fullmatch(regex, email) else False
@@ -119,7 +119,7 @@ if st.session_state["exit_survey"] is None:
                         st.warning("Please enter a email")
                     if email is not "" and check_email(email) is False:
                         st.warning("Please enter a valid email")
-                if name is not None and email is not None and check_email(email) == True and submit:
+                if consent_confirm is True and name is not None and email is not None and check_email(email) == True and submit:
                     st.session_state["consent_form"] = True
                     st.session_state["name"] = name
                     st.session_state["email"] = email
