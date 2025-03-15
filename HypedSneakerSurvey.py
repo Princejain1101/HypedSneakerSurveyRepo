@@ -13,7 +13,7 @@ st.set_page_config(layout="wide")
 
 sneaker1nolabel = "airforce1-nolabel.png"
 sneaker2nolabel = "airforce1ambush-nolabel.png"
-worksheet="SnearkerPreferenceStudyResponse"
+worksheet="SneakerPreferenceStudyResponseFinal"
 set_bg_hack_url()
 remove_top_white()
 scroll_script = """
@@ -25,25 +25,50 @@ setTimeout(function() {
 """
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 def check_email(email):
-    if email is "": return None
+    if email == "": return None
     return True if re.fullmatch(regex, email) else False
 
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-existing_data = conn.read(worksheet=worksheet, usecols=list(range(7)), ttl=5)
+def check_email_in_db(email):
+    existing_data_email_df = conn.read(worksheet=worksheet, usecols=[1], ttl=5)
+    previous_emails_list = existing_data_email_df.iloc[:, 0].tolist()
+    if email in previous_emails_list:
+        return True
+    else:
+        return False
+
 def update_results_to_sheet():
+    existing_data = conn.read(worksheet=worksheet, usecols=list(range(15)), ttl=5)
     now = datetime.now()
     date = now.date()
     time = now.time()
+    empty = "NA"
+    same_price_choice = None
+    if "same_price_question" in st.session_state:
+        if "Option 1" in st.session_state["same_price_question"]:
+            same_price_choice = "Option 1"
+        elif "Option 2" in st.session_state["same_price_question"]:
+            same_price_choice = "Option 2"
+        elif "indifferent" in st.session_state["same_price_question"]:
+            same_price_choice = "Indifferent"
     result_data = pd.DataFrame([
         {
             "name": st.session_state["name"],
             "email": st.session_state["email"],
             "date": date,
             "time": time,
-            "buy price": st.session_state.store_buy_value,
-            "not buy price": st.session_state.store_not_buy_value,
-            "maximum price": st.session_state["maximum_value"],
+            "never buy AF1" : st.session_state["never_buy_choice_sneaker1"] if st.session_state["never_buy_choice_sneaker1"] else empty,
+            "never buy AF1Ambush" : st.session_state["never_buy_choice_sneaker2"] if st.session_state["never_buy_choice_sneaker2"] else empty,
+            "buy price": st.session_state.store_buy_value if st.session_state.store_buy_value else empty,
+            "not buy price": st.session_state.store_not_buy_value if st.session_state.store_not_buy_value else empty,
+            "maximum price": st.session_state["maximum_value"] if st.session_state["maximum_value"] else empty,
+            "survey part1 done" : st.session_state["survey_part_one"] if st.session_state["survey_part_one"] else empty,
+            "same price preference" : same_price_choice if same_price_choice else empty,
+            "option 2 price" : st.session_state["not_buy_ambush_question"] if "not_buy_ambush_question" in st.session_state else empty,
+            "indifference price" : st.session_state["indifference_question"] if "indifference_question" in st.session_state else empty,
+            "indifference survey done" : st.session_state["run_indifference_survey"] if st.session_state["run_indifference_survey"] else empty,
+            "brands" : st.session_state["get_brands"] if st.session_state["get_brands"] else empty,
         }
     ])
     updated_data = pd.concat([existing_data, result_data], ignore_index=True)
@@ -117,9 +142,12 @@ if st.session_state["exit_survey"] is None:
                         st.warning("Please enter a name")
                     if email is "":
                         st.warning("Please enter a email")
-                    if email is not "" and check_email(email) is False:
-                        st.warning("Please enter a valid email")
-                if consent_confirm is True and name is not None and email is not None and check_email(email) == True and submit:
+                    if email is not "":
+                        if check_email(email) is False:
+                            st.warning("Please enter a valid email")
+                        elif check_email_in_db(email) is True:
+                            st.warning("User already filled the survey")
+                if consent_confirm is True and name is not None and email is not None and check_email(email) == True and check_email_in_db(email) is False and submit:
                     st.session_state["consent_form"] = True
                     st.session_state["name"] = name
                     st.session_state["email"] = email
@@ -278,6 +306,8 @@ if st.session_state["exit_survey"] is None:
         st.session_state["exit_survey"] = True
         st.rerun()
 else:
+    with st.spinner():
+        update_results_to_sheet()
     left_co, cent_co, last_co = st.columns([1,3,1])
     with cent_co:
         st.image([img for img in ["thankyousurvey3.png"]], width=550)

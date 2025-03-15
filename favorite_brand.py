@@ -44,13 +44,15 @@ def favorite_brand_api():
                 user_brand = st.text_input("Please enter your favorite brand")
                 submit = st.form_submit_button("Submit")
                 if submit and user_brand:
-                    st.session_state["final_favorite_brand_list"] = list(user_brand)
+                    st.session_state["final_favorite_brand_list"] = [st.session_state["favorite_brand"], user_brand]
+                    str_brands = ','.join(st.session_state["final_favorite_brand_list"])
+                    return str_brands
                     st.rerun()
             else:
                 submit = st.form_submit_button("Submit")
                 if submit:
                     st.session_state["final_favorite_brand_list"] = brands
-                    str_brands =  ','.join(list(st.session_state["favorite_brand"]) + brands)
+                    str_brands =  ','.join([st.session_state["favorite_brand"]] + brands)
                     return str_brands
                     # st.write("brands: ", brands)
                     # st.rerun()
