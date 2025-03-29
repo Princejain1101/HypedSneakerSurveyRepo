@@ -43,7 +43,7 @@ def update_results_to_sheet():
     now = datetime.now()
     date = now.date()
     time = now.time()
-    empty = "NA"
+    empty = "invalid"
     same_price_choice = None
     if "same_price_question" in st.session_state:
         if "Option 1" in st.session_state["same_price_question"]:
@@ -58,6 +58,7 @@ def update_results_to_sheet():
             "email": st.session_state["email"],
             "date": date,
             "time": time,
+            "never buy future sneaker": st.session_state["never_buy_future_sneaker"] if st.session_state["never_buy_future_sneaker"] else empty,
             "never buy AF1" : st.session_state["never_buy_choice_sneaker1"] if st.session_state["never_buy_choice_sneaker1"] else empty,
             "never buy AF1Ambush" : st.session_state["never_buy_choice_sneaker2"] if st.session_state["never_buy_choice_sneaker2"] else empty,
             "buy price": st.session_state.store_buy_value if st.session_state.store_buy_value else empty,
@@ -161,10 +162,11 @@ if st.session_state["exit_survey"] is None:
                 never_buy_future_sneaker = st.radio("Would you consider buying sneakers in the next year? ", ["Yes", "No"])
                 submit = st.form_submit_button("Submit")
                 if submit:
+                    st.session_state["never_buy_future_sneaker"] = never_buy_future_sneaker
                     if never_buy_future_sneaker == "No":
                         st.session_state["exit_survey"] = True
                         st.rerun()
-                    st.session_state["never_buy_future_sneaker"] = never_buy_future_sneaker
+                    
                     st.rerun()
         if st.session_state["never_buy_future_sneaker"] is not None:
             components.html(scroll_script, height=0)
