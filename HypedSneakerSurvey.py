@@ -39,7 +39,7 @@ def check_email_in_db(email):
         return False
 
 def update_results_to_sheet():
-    existing_data = conn.read(worksheet=worksheet, usecols=list(range(15)), ttl=5)
+    existing_data = conn.read(worksheet=worksheet, usecols=list(range(16)), ttl=5)
     now = datetime.now()
     date = now.date()
     time = now.time()
