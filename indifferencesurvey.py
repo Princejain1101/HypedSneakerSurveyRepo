@@ -32,7 +32,7 @@ def indifference_survey(maximum_value):
             st.image([img for img in ["airforce1ambush.png"]], width=350)
     else:
         # with st.form("Sneaker image"):
-        st.markdown("<center><p>Please take a look at these Nike Air Force 1 and Air Force 1 Ambush sneakers below</p></center>",
+        st.markdown("<left><p>Please take a look at these Nike Air Force 1 and Air Force 1 Ambush sneakers below</p></left>",
                     unsafe_allow_html=True)
         left_co, cent_co, right_co = st.columns([50, 1, 50])
         with left_co:
@@ -66,19 +66,34 @@ def indifference_survey(maximum_value):
                     # if st.form_submit_button("Exit the survey"):
                     #     st.stop()
     if st.session_state["same_price_question"] is not None and st.session_state["not_buy_ambush_question"] is None:
-        if "Option 1" in st.session_state["same_price_question"]:
-            with st.form(" Not Buy AirForce1 Price"):
+        with st.form(" Not Buy AirForce1 Price"):
+            not_buy_ambush_price = None
+            if "Option 1" in st.session_state["same_price_question"]:
                 not_buy_ambush_price = st.number_input(
-                    f"**At equal prices (\${price}), you prefer the Option 1 Air Force 1**.\n\nNow, please fill out a price for the **Option 2: Air Force 1 Ambush** at which you would DEFINITELY choose **Option 2: Air Force 1 Ambush**",
+                    f"At equal prices (\${price}), you prefer the Air Force 1.\n\n Now, lets fill out a price for the Air Force 1 Ambush \n\n **At what price would you definitely pick the Air Force 1 Ambush but not the Air Force 1?**", \
                     value=None, min_value=0, max_value=price, step=1)
+                # left_co, cent_co, right_co = st.columns([50, 1, 50])
+                # with left_co:
+                #     if st.form_submit_button("please confirm your choice"):
+                #         st.session_state["not_buy_ambush_question"] = not_buy_ambush_price
+                #         st.rerun()
+                # with right_co:
+                #     if st.form_submit_button("Go back"):
+                #         st.session_state["same_price_question"] = None
+                #         st.rerun()
+            else:
+            # with st.form(" Not Buy AirForce1Ambush Price"):
+                not_buy_ambush_price = st.number_input(
+                    f"At equal prices (\${price}), you prefer the Air Force 1 Ambush.\n\n Now, lets fill out a price for the Air Force 1 Ambush \n\n **At what price would you definitely not pick the Air Force 1 Ambush but pick the Air Force 1 instead?**", \
+                    value=None, min_value=price+1, max_value=10000, step=1)
+            left_co, cent_co, right_co = st.columns([50, 1, 50])
+            with left_co:
                 if st.form_submit_button("please confirm your choice"):
                     st.session_state["not_buy_ambush_question"] = not_buy_ambush_price
                     st.rerun()
-        else:
-            with st.form(" Not Buy AirForce1Ambush Price"):
-                not_buy_ambush_price = st.number_input(f"**At equal prices (\${price}), you prefer the Option 2 Air Force 1 Ambush**.\n\nNow, please fill out a price for the **Option 2: Air Force 1 Ambush** at which you would DEFINITELY choose **Option 1: Air Force 1**", value=None, min_value=price+1, max_value=10000, step=1)
-                if st.form_submit_button("please confirm your choice"):
-                    st.session_state["not_buy_ambush_question"] = not_buy_ambush_price
+            with right_co:
+                if st.form_submit_button("Go back to previous question"):
+                    st.session_state["same_price_question"] = None
                     st.rerun()
 
     if st.session_state["not_buy_ambush_question"] is not None and st.session_state["verify_not_buy_ambush_question"] is None:
@@ -95,7 +110,7 @@ def indifference_survey(maximum_value):
                 else:
                     # st.write("Go back to question2")
                     st.session_state["not_buy_ambush_question"] = None
-                    st.warning("You have not chosen a correct price for Option 2: Air force 1 Ambush then. Please try again.")
+                    st.warning("You have not chosen a correct price for Air force 1 Ambush then. Please try again.")
                     if st.form_submit_button("Try Again"):
                         st.rerun()
     if st.session_state["verify_not_buy_ambush_question"] is not None and st.session_state["indifference_question"] is None:
@@ -115,23 +130,34 @@ def indifference_survey(maximum_value):
                     st.rerun()
     if st.session_state["indifference_question"] is not None and st.session_state["verify_indifference_question"] is None:
         with st.form(" verify indifference question"):
-            st.write(f"Price for Option 1: Air Force 1 is \${price} and Option 2: Air Force 1 Ambush is at \${st.session_state["indifference_question"]}")
-            st.write(f"Please confirm that at this price you are indifferent between the two options")
+            st.write(f"Now consider these 2 options. \n\n Option 1: Air Force 1 at \${price} \n\n Option 2: Air Force 1 Ambush at \${st.session_state["indifference_question"]}")
+            # st.write(f"Please confirm that at this price you are indifferent between the two options")
+            verify_indifferece = st.radio("Are you indifferent between the two options?", ("Yes, I am indifferent between the two options", "No, I am not indifferent between the two options"))
             if st.form_submit_button("please confirm your choice"):
-                st.session_state["verify_indifference_question"] = True
-                st.rerun()
+                if "Yes" in verify_indifferece:
+                    # st.write("Move Forward")
+                    st.session_state["verify_indifference_question"] = verify_indifferece
+                    st.rerun()
+                else:
+                    st.warning(f"‘Hmm....Since you are not indifferent between the two options, please input a price for Air Force 1 Ambush at which you are truly indifferent between the two options.")
+                    st.session_state["indifference_question"] = None
+                    if st.form_submit_button("try again"):
+                        st.rerun()
+                # st.session_state["verify_indifference_question"] = True
+                # st.rerun()
+
     if st.session_state["verify_indifference_question"] is not None and st.session_state["verify_indifference_question_partA"] is None:
         with st.form(" Verify Indifference question partA"):
             st.write(
-                f"Price for Option 1: Air Force 1 is \${price} and Option 2: Air Force 1 Ambush is at \${st.session_state["indifference_question"]}")
-            verify_indifferenceA = st.radio("Q5 A. Can the program select option 2 for you? Are you OK with that?", ("Yes, I am ", "No, I prefer Option 1"))
+                f"Now consider these 2 options. \n\n Option 1: Air Force 1 at \${price} \n\n Option 2: Air Force 1 Ambush at \${st.session_state["indifference_question"]}")
+            verify_indifferenceA = st.radio("Q5 A. Can the program select Option 2 for you? Are you OK with that?", ("Yes, I am ", "No, I prefer Option 1"))
             if st.form_submit_button("Submit"):
                 if "Yes" in verify_indifferenceA:
                     # st.write("Move Forward")
                     st.session_state["verify_indifference_question_partA"] = verify_indifferenceA
                     st.rerun()
                 else:
-                    st.warning(f"‘Hmm....Since you prefer option 1, you are apparently not quite indifferent between the two options. Hence the selected price of {st.session_state["indifference_question"]} is too high for you to be indifferent. So think this through a bit more and please input a price at which you are truly indifferent between the two options.")
+                    st.warning(f"‘Hmm....Since you prefer Option 1, you are apparently not quite indifferent between the two options. Hence the selected price of {st.session_state["indifference_question"]} is too high for you to be indifferent. So think this through a bit more and please input a price at which you are truly indifferent between the two options.")
                     st.session_state["indifference_question"] = None
                     st.session_state["verify_indifference_question"] = None
                     if st.form_submit_button("try again"):
@@ -139,15 +165,15 @@ def indifference_survey(maximum_value):
     if st.session_state["verify_indifference_question_partA"] is not None and st.session_state["verify_indifference_question_partB"] is None:
         with st.form(" Verify Indifference question partB"):
             st.write(
-                f"Price for Option 1: Air Force 1 is \${price} and Option 2: Air Force 1 Ambush is at \${st.session_state["indifference_question"]}")
-            verify_indifferenceB = st.radio("Q5 B. Can the program select option 1 for you? Are you OK with that?", ("Yes, I am", "No, I prefer Option 2"))
+                f"Now consider these 2 options. \n\n Option 1: Air Force 1 at \${price} \n\n Option 2: Air Force 1 Ambush at \${st.session_state["indifference_question"]}")
+            verify_indifferenceB = st.radio("Q5 B. Can the program select Option 1 for you? Are you OK with that?", ("Yes, I am", "No, I prefer Option 2"))
             if st.form_submit_button("please confirm your choice"):
                 if "Yes" in verify_indifferenceB:
                     # st.write("Move Forward")
                     st.session_state["verify_indifference_question_partB"] = verify_indifferenceB
                     st.rerun()
                 else:
-                    st.warning(f"‘Hmm....Since you prefer option 1, you are apparently not quite indifferent between the two options. Hence the selected price of {st.session_state["indifference_question"]} is too low for you to be indifferent. So think this through a bit more and please input a price at which you are truly indifferent between the two options.")
+                    st.warning(f"‘Hmm....Since you prefer Option 1, you are apparently not quite indifferent between the two options. Hence the selected price of {st.session_state["indifference_question"]} is too low for you to be indifferent. So think this through a bit more and please input a price at which you are truly indifferent between the two options.")
                     st.session_state["indifference_question"] = None
                     st.session_state["verify_indifference_question"] = None
                     st.session_state["verify_indifference_question_partA"] = None

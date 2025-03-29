@@ -89,6 +89,8 @@ if "name" not in st.session_state:
     st.session_state["name"] = None
 if "email" not in st.session_state:
     st.session_state["email"] = None
+if "never_buy_future_sneaker" not in st.session_state:
+    st.session_state["never_buy_future_sneaker"] = None
 if "sneaker_image" not in st.session_state:
     st.session_state["sneaker_image"] = None
 if "never_buy_choice_sneaker1" not in st.session_state:
@@ -117,10 +119,12 @@ if "survey_part_one" not in st.session_state:
     st.session_state["survey_part_one"] = None
 if "run_indifference_survey" not in st.session_state:
     st.session_state["run_indifference_survey"] = None
+if "show_sneaker2_image" not in st.session_state:
+    st.session_state["show_sneaker2_image"] = None
 if "get_brands" not in st.session_state:
     st.session_state["get_brands"] = None
 
-st.markdown("<h1 style='text-align: center; color: black;'>Sneaker Preference Study</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: left; color: black;'>Sneaker Preference Study</h1>", unsafe_allow_html=True)
 # st.session_state["survey_part_one"] = True
 # st.session_state["maximum_value"] = 40
 if st.session_state["exit_survey"] is None:
@@ -152,7 +156,17 @@ if st.session_state["exit_survey"] is None:
                     st.session_state["name"] = name
                     st.session_state["email"] = email
                     st.rerun()
-        if st.session_state["consent_form"] is not None:
+        if st.session_state["consent_form"] is not None and st.session_state["never_buy_future_sneaker"] is None:
+            with st.form("never buy future sneaker"):
+                never_buy_future_sneaker = st.radio("Would you consider buying sneakers in the next year? ", ["Yes", "No"])
+                submit = st.form_submit_button("Submit")
+                if submit:
+                    if never_buy_future_sneaker == "No":
+                        st.session_state["exit_survey"] = True
+                        st.rerun()
+                    st.session_state["never_buy_future_sneaker"] = never_buy_future_sneaker
+                    st.rerun()
+        if st.session_state["never_buy_future_sneaker"] is not None:
             components.html(scroll_script, height=0)
 
             sneakerimage = sneaker1nolabel
@@ -161,21 +175,21 @@ if st.session_state["exit_survey"] is None:
 
             if st.session_state["sneaker_image"] is not None and st.session_state["survey_part_one"] is None:
                 left_co, cent_co, right_co = st.columns([1,3,1])
-                with cent_co:
+                with left_co:
                     st.image([img for img in [sneakerimage]], width=550)
             else:
                 # with st.form("Sneaker image"):
                 if sneakerimage is sneaker1nolabel:
-                    st.markdown("<center><p>Please take a look at this Nike Air Force 1 sneakers below</p></center>", unsafe_allow_html=True)
+                    st.markdown("<p>Please take a look at the Nike Air Force 1 sneaker below</p></center>", unsafe_allow_html=True)
                 else:
-                    st.markdown("<center><p>Please take a look at this Nike Air Force 1 Ambush sneakers below</p></center>", unsafe_allow_html=True)
+                    st.markdown("<p>Please take a look at the Nike Air Force 1 Ambush sneaker below</p></center>", unsafe_allow_html=True)
 
                 left_co, cent_co, right_co = st.columns([1,3,1])
-                with cent_co:
+                with left_co:
                     st.image([img for img in [sneakerimage]], width=550)
                 left_su, cent_su, right_su = st.columns([3,2,3])
-                with cent_su:
-                    submit = st.button("Confirm")
+                with left_su:
+                    submit = st.button("Confirm", key="confirm2")
                 if submit:
                     st.session_state["sneaker_image"] = True
                     st.rerun()
@@ -185,10 +199,10 @@ if st.session_state["exit_survey"] is None:
 
             with st.form("Get Buy Value"):
                 buy_value = st.number_input("Q1. At what price (in USD) would you DEFINITELY BUY these sneakers?*", value=None, min_value=0, max_value=100000, step=1, placeholder=None)
-                never_buy_choice = st.checkbox("Check this box If you would never buy these sneakers whatever its price may be.")
+                never_buy_choice = st.checkbox("Check this box If you would never buy these sneakers whatever its price may be")
                 buy_value_submitted = st.form_submit_button("please submit your choice")
                 if buy_value_submitted and never_buy_choice is True :
-                    if st.session_state["never_buy_choice_sneaker1"] is True: ## sneaker2 is also not buy
+                    if st.session_state["never_buy_choice_sneaker1"] is True: ## both is also not buy
                         st.session_state["never_buy_choice_sneaker2"] = True
                         st.session_state["exit_survey"] = True
                         st.rerun()
@@ -267,14 +281,21 @@ if st.session_state["exit_survey"] is None:
             with st.form("Exit survey"):
                 st.write(f"Maximum price was \${st.session_state.maximum_value}")
                 left_col, center_col, right_col = st.columns((3,1,2))
-                with left_col:
-                    name = st.session_state["name"]
-                    email = st.session_state["email"]
-                    maximum_value = st.session_state["maximum_value"]
-                    if st.form_submit_button("Continue to part 2 of the survey"):
-                        st.session_state["survey_part_one"] = True
-                        st.rerun()
-                    # st.link_button("Continue to part 2 of the survey", f"https://indifferencesurvey.streamlit.app/?name={name}&email={email}&maximum_value={maximum_value}")
+                if st.session_state["never_buy_choice_sneaker1"] is not True: # not continue to indifference part 2 if first sneaker is not buy
+                    with left_col:
+                        name = st.session_state["name"]
+                        email = st.session_state["email"]
+                        maximum_value = st.session_state["maximum_value"]
+                        if st.form_submit_button("Continue to part 2 of the survey"):
+                            st.session_state["survey_part_one"] = True
+                            st.rerun()
+                        # st.link_button("Continue to part 2 of the survey", f"https://indifferencesurvey.streamlit.app/?name={name}&email={email}&maximum_value={maximum_value}")
+                else:
+                    with left_col:
+                        if st.form_submit_button("Exit survey"):
+                            st.session_state["run_indifference_survey"] = True
+                            st.session_state["survey_part_one"] = True
+                            st.rerun()
                 with right_col:
                     submit = st.form_submit_button("Retake this survey")
                     if submit:
@@ -283,9 +304,23 @@ if st.session_state["exit_survey"] is None:
                         st.session_state["maximum_value"] = None
                         st.rerun()
     if st.session_state["survey_part_one"] is not None and st.session_state["run_indifference_survey"] is None:
-        if indifference_survey(st.session_state["maximum_value"]):
-            st.session_state["run_indifference_survey"] = True
-            st.rerun()
+
+        if st.session_state["show_sneaker2_image"] is None:
+            st.markdown("<p>Please take a look at the Nike Air Force 1 Ambush sneaker below</p></center>", unsafe_allow_html=True)
+            left_co, cent_co, right_co = st.columns([1,3,1])
+            with left_co:
+                st.image([img for img in [sneaker2nolabel]], width=550)
+            left_su, cent_su, right_su = st.columns([3,2,3])
+            with left_su:
+                submit = st.button("Confirm", key="confirm3")
+            if submit:
+                st.session_state["show_sneaker2_image"] = True
+                st.rerun()
+   
+        if st.session_state["show_sneaker2_image"] is not None:
+            if indifference_survey(st.session_state["maximum_value"]):
+                st.session_state["run_indifference_survey"] = True
+                st.rerun()
             #     st.write(f"Maximum price was \${st.session_state.maximum_value}")
             #     left_col, cent_col, right_col = st.columns(3)
             #     with left_col:
@@ -309,7 +344,7 @@ else:
     with st.spinner():
         update_results_to_sheet()
     left_co, cent_co, last_co = st.columns([1,3,1])
-    with cent_co:
+    with left_co:
         st.image([img for img in ["thankyousurvey3.png"]], width=550)
 
 # Inject the JavaScript at the end of the app
