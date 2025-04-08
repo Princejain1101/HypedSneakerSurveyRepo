@@ -1,4 +1,5 @@
 import streamlit as st
+
 def indifference_survey(maximum_value):
     # left_col, right_col = st.columns(2)
     # with left_col:
@@ -6,22 +7,6 @@ def indifference_survey(maximum_value):
     # with right_col:
     #     st.image([img for img in ["airforce1ambush.png"]], width=350)
     price = maximum_value
-    if "both_sneakers_image" not in st.session_state:
-        st.session_state["both_sneakers_image"] = None
-    if "same_price_question" not in st.session_state:
-        st.session_state["same_price_question"] = None
-    if "not_buy_ambush_question" not in st.session_state:
-        st.session_state["not_buy_ambush_question"] = None
-    if "verify_not_buy_ambush_question" not in st.session_state:
-        st.session_state["verify_not_buy_ambush_question"] = None
-    if "indifference_question" not in st.session_state:
-        st.session_state["indifference_question"] = None
-    if "verify_indifference_question" not in st.session_state:
-        st.session_state["verify_indifference_question"] = None
-    if "verify_indifference_question_partA" not in st.session_state:
-        st.session_state["verify_indifference_question_partA"] = None
-    if "verify_indifference_question_partB" not in st.session_state:
-        st.session_state["verify_indifference_question_partB"] = None
 
 
     if st.session_state["both_sneakers_image"] is not None:

@@ -37,6 +37,23 @@ def check_email_in_db(email):
         return True
     else:
         return False
+if "both_sneakers_image" not in st.session_state:
+    st.session_state["both_sneakers_image"] = None
+if "same_price_question" not in st.session_state:
+    st.session_state["same_price_question"] = None
+if "not_buy_ambush_question" not in st.session_state:
+    st.session_state["not_buy_ambush_question"] = None
+if "verify_not_buy_ambush_question" not in st.session_state:
+    st.session_state["verify_not_buy_ambush_question"] = None
+if "indifference_question" not in st.session_state:
+    st.session_state["indifference_question"] = None
+if "verify_indifference_question" not in st.session_state:
+    st.session_state["verify_indifference_question"] = None
+if "verify_indifference_question_partA" not in st.session_state:
+    st.session_state["verify_indifference_question_partA"] = None
+if "verify_indifference_question_partB" not in st.session_state:
+    st.session_state["verify_indifference_question_partB"] = None
+
 
 def update_results_to_sheet():
     existing_data = conn.read(worksheet=worksheet, usecols=list(range(16)), ttl=5)
@@ -45,7 +62,7 @@ def update_results_to_sheet():
     time = now.time()
     empty = "invalid"
     same_price_choice = None
-    if "same_price_question" in st.session_state:
+    if "same_price_question" in st.session_state and st.session_state["same_price_question"] is not None:
         if "Option 1" in st.session_state["same_price_question"]:
             same_price_choice = "Option 1"
         elif "Option 2" in st.session_state["same_price_question"]:
