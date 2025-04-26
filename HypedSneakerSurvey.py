@@ -176,7 +176,7 @@ if st.session_state["exit_survey"] is None:
                     st.rerun()
         if st.session_state["consent_form"] is not None and st.session_state["never_buy_future_sneaker"] is None:
             with st.form("never buy future sneaker"):
-                never_buy_future_sneaker = st.radio("Would you consider buying sneakers in the next year? ", ["Yes", "No"])
+                never_buy_future_sneaker = st.radio("Would you consider buying sneakers in the next year? ", ["Yes", "No"], index=None)
                 submit = st.form_submit_button("Submit")
                 if submit:
                     st.session_state["never_buy_future_sneaker"] = never_buy_future_sneaker
@@ -273,7 +273,7 @@ if st.session_state["exit_survey"] is None:
                             change = st.form_submit_button("please submit your choice")#, on_click=set_new_price, args=[st.session_state.check_price_answer])
                             # form_submitted = st.form_submit_button("Submit Possible Price form")
                         with placeholder_for_radio:
-                            check_price_answer = st.radio(f"Q3. Would you buy these sneakers at a price of **\${st.session_state["check_price"]}** ?", ["Yes", "No"])
+                            check_price_answer = st.radio(f"Q3. Would you buy these sneakers at a price of **\${st.session_state["check_price"]}** ?", ["Yes", "No"], index=None)
                             # st.write("B check price answer = " + str(st.session_state.check_price_answer))
                         if change:
                             st.session_state.check_price_answer = check_price_answer

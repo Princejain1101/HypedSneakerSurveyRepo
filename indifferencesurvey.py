@@ -33,7 +33,7 @@ def indifference_survey(maximum_value):
     if st.session_state["both_sneakers_image"] is not None and st.session_state["same_price_question"] is None:
         with st.form(key='buy ambush form at same price'):
             st.write(f"**Now please compare the following two options**: \n\nBoth the Air Force 1 and the Air Force 1 Ambush are priced at **\${price}**")
-            same_price = st.radio("Q1. Which option do you prefer?", (f"Option 1: Air Force 1 at a price of \${price}", f"Option 2: Air Force 1 Ambush at a price of \${price}", "I am indifferent between Option 1 and Option 2"))
+            same_price = st.radio("Q1. Which option do you prefer?", (f"Option 1: Air Force 1 at a price of \${price}", f"Option 2: Air Force 1 Ambush at a price of \${price}", "I am indifferent between Option 1 and Option 2"), index=None)
             if st.form_submit_button("please confirm your choice"):
                 # if "Option 1 " in same_price:
                 #     st.write("Option1 AirForce1 is chosen, so you are likely not a right candidate. Please exit the survey.")
@@ -84,9 +84,9 @@ def indifference_survey(maximum_value):
     if st.session_state["not_buy_ambush_question"] is not None and st.session_state["verify_not_buy_ambush_question"] is None:
         with (st.form(" Verify Not Buy Ambush Price")):
             if "Option 1" in st.session_state["same_price_question"]:
-                verify_not_buy_ambush = st.radio(f"Q3. Can you confirm that you would chose **Option 2: Air Force 1 Ambush at \${st.session_state["not_buy_ambush_question"]}** price given **Option 1: Air Force 1 at \${price}** ?", ("Yes, I confirm that I would definitely choose option 2", "No, I cannot confirm that I would definitely choose option 2"))
+                verify_not_buy_ambush = st.radio(f"Q3. Can you confirm that you would chose **Option 2: Air Force 1 Ambush at \${st.session_state["not_buy_ambush_question"]}** price given **Option 1: Air Force 1 at \${price}** ?", ("Yes, I confirm that I would definitely choose option 2", "No, I cannot confirm that I would definitely choose option 2"), index=None)
             else:
-                verify_not_buy_ambush = st.radio(f"Q3. Can you confirm that you would chose **Option 1: Air Force 1 at \${price}** if **Option 2: Air Force 1 Ambush is at \${st.session_state["not_buy_ambush_question"]}** price?", ("Yes, I confirm that I would definitely choose option 1", "No, I cannot confirm that I would definitely choose option 1"))
+                verify_not_buy_ambush = st.radio(f"Q3. Can you confirm that you would chose **Option 1: Air Force 1 at \${price}** if **Option 2: Air Force 1 Ambush is at \${st.session_state["not_buy_ambush_question"]}** price?", ("Yes, I confirm that I would definitely choose option 1", "No, I cannot confirm that I would definitely choose option 1"), index=None)
             if st.form_submit_button("please confirm your choice"):
                 if "Yes" in verify_not_buy_ambush:
                     # st.write("Move Forward")
@@ -117,7 +117,7 @@ def indifference_survey(maximum_value):
         with st.form(" verify indifference question"):
             st.write(f"Now consider these 2 options. \n\n Option 1: Air Force 1 at \${price} \n\n Option 2: Air Force 1 Ambush at \${st.session_state["indifference_question"]}")
             # st.write(f"Please confirm that at this price you are indifferent between the two options")
-            verify_indifferece = st.radio("Are you indifferent between the two options?", ("Yes, I am indifferent between the two options", "No, I am not indifferent between the two options"))
+            verify_indifferece = st.radio("Are you indifferent between the two options?", ("Yes, I am indifferent between the two options", "No, I am not indifferent between the two options"), index=None)
             if st.form_submit_button("please confirm your choice"):
                 if "Yes" in verify_indifferece:
                     # st.write("Move Forward")
@@ -135,7 +135,7 @@ def indifference_survey(maximum_value):
         with st.form(" Verify Indifference question partA"):
             st.write(
                 f"Again consider these 2 options. \n\n Option 1: Air Force 1 at \${price} \n\n Option 2: Air Force 1 Ambush at \${st.session_state["indifference_question"]}")
-            verify_indifferenceA = st.radio("Q5 A. Can the program select Option 2 for you? Are you OK with that?", ("Yes, I am ", "No, I prefer Option 1"))
+            verify_indifferenceA = st.radio("Q5 A. Can the program select Option 2 for you? Are you OK with that?", ("Yes, I am ", "No, I prefer Option 1"), index=None)
             if st.form_submit_button("Submit"):
                 if "Yes" in verify_indifferenceA:
                     # st.write("Move Forward")
@@ -151,7 +151,7 @@ def indifference_survey(maximum_value):
         with st.form(" Verify Indifference question partB"):
             st.write(
                 f"Again consider these 2 options. \n\n Option 1: Air Force 1 at \${price} \n\n Option 2: Air Force 1 Ambush at \${st.session_state["indifference_question"]}")
-            verify_indifferenceB = st.radio("Q5 B. Can the program select Option 1 for you? Are you OK with that?", ("Yes, I am", "No, I prefer Option 2"))
+            verify_indifferenceB = st.radio("Q5 B. Can the program select Option 1 for you? Are you OK with that?", ("Yes, I am", "No, I prefer Option 2"), index=None)
             if st.form_submit_button("please confirm your choice"):
                 if "Yes" in verify_indifferenceB:
                     # st.write("Move Forward")

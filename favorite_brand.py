@@ -26,7 +26,7 @@ def favorite_brand_api():
                     st.rerun()
     if st.session_state["favorite_brand"] and st.session_state["second_favorite_brand"] is None:
         with st.form("Exclusive check"):
-            exclusive = st.radio(f"Do you exclusively buy {st.session_state["favorite_brand"]} brand of sneakers?", ("Yes", "No"))
+            exclusive = st.radio(f"Do you exclusively buy {st.session_state["favorite_brand"]} brand of sneakers?", ("Yes", "No"), index=None)
             submit = st.form_submit_button("Submit")
             if exclusive and submit:
                 if "Yes" in exclusive:
