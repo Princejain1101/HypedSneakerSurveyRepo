@@ -4,11 +4,12 @@ import pandas as pd
 import re
 from layout_utils import set_bg_hack_url, remove_top_white
 from consent_form import consent_text, consent_header
-from price_calculations import calc_new_price, set_new_price, update_buy_not_buy_price
+from price_calculations import set_new_price, update_buy_not_buy_price, set_new_price_up
 from datetime import datetime
 import streamlit.components.v1 as components
 from indifferencesurvey import indifference_survey
 from favorite_brand import favorite_brand_api
+import random
 st.set_page_config(layout="wide")
 
 sneaker1nolabel = "airforce1-nolabel.png"
@@ -56,7 +57,7 @@ if "verify_indifference_question_partB" not in st.session_state:
 
 
 def update_results_to_sheet():
-    existing_data = conn.read(worksheet=worksheet, usecols=list(range(16)), ttl=5)
+    existing_data = conn.read(worksheet=worksheet, usecols=list(range(17)), ttl=5)
     now = datetime.now()
     date = now.date()
     time = now.time()
@@ -87,12 +88,93 @@ def update_results_to_sheet():
             "indifference price" : st.session_state["indifference_question"] if "indifference_question" in st.session_state else empty,
             "indifference survey done" : st.session_state["run_indifference_survey"] if st.session_state["run_indifference_survey"] else empty,
             "brands" : st.session_state["get_brands"] if st.session_state["get_brands"] else empty,
+            "up_down" : st.session_state["go_up"] if st.session_state["go_up"] is not None else empty,
         }
     ])
     updated_data = pd.concat([existing_data, result_data], ignore_index=True)
     conn.update(worksheet=worksheet, data=updated_data)
 
 # st.dataframe(existing_data)
+def go_up():
+    if st.session_state["go_up"] is None:
+        st.session_state["go_up"] = random.randint(0, 1)
+    if st.session_state["go_up"] == 0:
+        st.session_state["first_question"] = "buy_value"
+        return False
+    else:
+        st.session_state["first_question"] = "not_buy_value"
+        return True
+
+def buy_question_first():
+    if st.session_state["sneaker_image"] is not None and st.session_state["buy_value"] is None:
+        components.html(scroll_script, height=0)
+
+        with st.form("Get Buy Value"):
+            buy_value = st.number_input("Q1. At what price (in USD) would you DEFINITELY BUY these sneakers?*", value=None, min_value=0, max_value=100000, step=1, placeholder=None)
+            never_buy_choice = st.checkbox("Check this box If you would never buy these sneakers whatever its price may be", value=False)
+            buy_value_submitted = st.form_submit_button("please submit your choice")
+            if buy_value_submitted and never_buy_choice is True :
+                if st.session_state["never_buy_choice_sneaker1"] is True: ## both is also not buy
+                    st.session_state["never_buy_choice_sneaker2"] = True
+                    st.session_state["exit_survey"] = True
+                    st.rerun()
+                else:
+                    st.session_state["never_buy_choice_sneaker1"] = True
+                    st.session_state["sneaker_image"] = None
+                    st.rerun()
+            if buy_value_submitted and st.session_state["never_buy_choice_sneaker1"] is not True:
+                st.session_state["buy_value"] = buy_value
+                st.session_state["store_buy_value"] = buy_value
+                st.rerun()
+            if buy_value_submitted and st.session_state["never_buy_choice_sneaker2"] is not True:
+                st.session_state["buy_value"] = buy_value
+                st.session_state["store_buy_value"] = buy_value
+                st.rerun()
+    if st.session_state["buy_value"] is not None and st.session_state["not_buy_value"] is None:
+        components.html(scroll_script, height=0)
+
+        with st.form("Get Not Buy Value"):
+            not_buy_value = st.number_input("Q2. At what price (in USD) would you DEFINITELY NOT BUY these sneakers?*", value=None, min_value=0, max_value=100000,step=1)
+            not_buy_value_submitted = st.form_submit_button("please submit your choice")
+        if not_buy_value_submitted:
+            st.session_state["not_buy_value"] = not_buy_value
+            st.session_state["store_not_buy_value"] = not_buy_value
+            st.rerun()
+def not_buy_question_first():
+    if st.session_state["sneaker_image"] is not None and st.session_state["not_buy_value"] is None:
+        components.html(scroll_script, height=0)
+
+        with st.form("Get Not Buy Value"):
+            not_buy_value = st.number_input("Q1. At what price (in USD) would you DEFINITELY NOT BUY these sneakers?*", value=None, min_value=0, max_value=100000, step=1, placeholder=None)
+            never_buy_choice = st.checkbox("Check this box If you would never buy these sneakers whatever its price may be", value=False)
+            not_buy_value_submitted = st.form_submit_button("please submit your choice")
+            if not_buy_value_submitted and never_buy_choice is True :
+                if st.session_state["never_buy_choice_sneaker1"] is True: ## both is also not buy
+                    st.session_state["never_buy_choice_sneaker2"] = True
+                    st.session_state["exit_survey"] = True
+                    st.rerun()
+                else:
+                    st.session_state["never_buy_choice_sneaker1"] = True
+                    st.session_state["sneaker_image"] = None
+                    st.rerun()
+            if not_buy_value_submitted and st.session_state["never_buy_choice_sneaker1"] is not True:
+                st.session_state["not_buy_value"] = not_buy_value
+                st.session_state["store_not_buy_value"] = not_buy_value
+                st.rerun()
+            if not_buy_value_submitted and st.session_state["never_buy_choice_sneaker2"] is not True:
+                st.session_state["not_buy_value"] = not_buy_value
+                st.session_state["store_not_buy_value"] = store_not_buy_value
+                st.rerun()
+    if st.session_state["not_buy_value"] is not None and st.session_state["buy_value"] is None:
+        components.html(scroll_script, height=0)
+
+        with st.form("Get Buy Value"):
+            buy_value = st.number_input("Q2. At what price (in USD) would you DEFINITELY BUY these sneakers?*", value=None, min_value=0, max_value=100000,step=1)
+            buy_value_submitted = st.form_submit_button("please submit your choice")
+        if buy_value_submitted:
+            st.session_state["buy_value"] = buy_value
+            st.session_state["store_buy_value"] = buy_value
+            st.rerun()
 
 def check_exit():
     # st.write("not buy value = ", st.session_state.not_buy_value)
@@ -141,7 +223,16 @@ if "show_sneaker2_image" not in st.session_state:
     st.session_state["show_sneaker2_image"] = None
 if "get_brands" not in st.session_state:
     st.session_state["get_brands"] = None
-
+if "sneaker_name1" not in st.session_state:
+    st.session_state["sneaker_name1"] = "Air Force 1"
+if "sneaker_name2" not in st.session_state:
+    st.session_state["sneaker_name2"] = "Air Force 1 Ambush"
+if "sneaker_name" not in st.session_state:
+    st.session_state["sneaker_name"] = None
+if "go_up" not in st.session_state:
+    st.session_state["go_up"] = None
+if "first_question" not in st.session_state:
+    st.session_state["first_question"] = None
 st.markdown("<h1 style='text-align: left; color: black;'>Sneaker Preference Study</h1>", unsafe_allow_html=True)
 # st.session_state["survey_part_one"] = True
 # st.session_state["maximum_value"] = 40
@@ -160,11 +251,11 @@ if st.session_state["exit_survey"] is None:
                 if submit:
                     if consent_confirm is not True:
                         st.warning("Please agree to the consent form")
-                    if name is "":
+                    if name == "":
                         st.warning("Please enter a name")
-                    if email is "":
+                    if email == "":
                         st.warning("Please enter a email")
-                    if email is not "":
+                    if email != "":
                         if check_email(email) is False:
                             st.warning("Please enter a valid email")
                         elif check_email_in_db(email) is True:
@@ -189,8 +280,10 @@ if st.session_state["exit_survey"] is None:
             components.html(scroll_script, height=0)
 
             sneakerimage = sneaker1nolabel
+            st.session_state["sneaker_name"] = st.session_state["sneaker_name1"]
             if st.session_state["never_buy_choice_sneaker1"] is not None:
                 sneakerimage = sneaker2nolabel
+                st.session_state["sneaker_name"] = st.session_state["sneaker_name2"]
 
             if st.session_state["sneaker_image"] is not None and st.session_state["survey_part_one"] is None:
                 left_co, cent_co, right_co = st.columns([1,3,1])
@@ -212,41 +305,11 @@ if st.session_state["exit_survey"] is None:
                 if submit:
                     st.session_state["sneaker_image"] = True
                     st.rerun()
-
-        if st.session_state["sneaker_image"] is not None and st.session_state["buy_value"] is None:
-            components.html(scroll_script, height=0)
-
-            with st.form("Get Buy Value"):
-                buy_value = st.number_input("Q1. At what price (in USD) would you DEFINITELY BUY these sneakers?*", value=None, min_value=0, max_value=100000, step=1, placeholder=None)
-                never_buy_choice = st.checkbox("Check this box If you would never buy these sneakers whatever its price may be")
-                buy_value_submitted = st.form_submit_button("please submit your choice")
-                if buy_value_submitted and never_buy_choice is True :
-                    if st.session_state["never_buy_choice_sneaker1"] is True: ## both is also not buy
-                        st.session_state["never_buy_choice_sneaker2"] = True
-                        st.session_state["exit_survey"] = True
-                        st.rerun()
-                    else:
-                        st.session_state["never_buy_choice_sneaker1"] = True
-                        st.session_state["sneaker_image"] = None
-                        st.rerun()
-                if buy_value_submitted and st.session_state["never_buy_choice_sneaker1"] is not True:
-                    st.session_state["buy_value"] = buy_value
-                    st.session_state["store_buy_value"] = buy_value
-                    st.rerun()
-                if buy_value_submitted and st.session_state["never_buy_choice_sneaker2"] is not True:
-                    st.session_state["buy_value"] = buy_value
-                    st.session_state["store_buy_value"] = buy_value
-                    st.rerun()
-        if st.session_state["buy_value"] is not None and st.session_state["not_buy_value"] is None:
-            components.html(scroll_script, height=0)
-
-            with st.form("Get Not Buy Value"):
-                not_buy_value = st.number_input("Q2. At what price (in USD) would you DEFINITELY NOT BUY these sneakers?*", value=None, min_value=0, max_value=100000,step=1)
-                not_buy_value_submitted = st.form_submit_button("please submit your choice")
-            if not_buy_value_submitted:
-                st.session_state["not_buy_value"] = not_buy_value
-                st.session_state["store_not_buy_value"] = not_buy_value
-                st.rerun()
+        first_question = st.session_state["first_question"]
+        if go_up():
+            not_buy_question_first()
+        else:
+            buy_question_first()
         if st.session_state["not_buy_value"] is not None and st.session_state["buy_value"] is not None and st.session_state["survey_part_one"] is None:
             # st.write("A")
             if st.session_state["not_buy_value"] <= st.session_state["buy_value"] and st.session_state["check_price"] is None:
@@ -260,11 +323,18 @@ if st.session_state["exit_survey"] is None:
             else:
                 # st.write("Your new Range is: " + str(st.session_state.buy_value) + " -> " + str(st.session_state.not_buy_value))
                 # st.write("D")
-                set_new_price(st.session_state.check_price_answer)
+                if go_up():
+                    set_new_price_up(st.session_state.check_price_answer)
+                else:
+                    set_new_price(st.session_state.check_price_answer)
                 if not check_exit():
                     with st.form("Check Next Possible Price"):
-                        st.write(
-                            f"You mentioned that you would DEFINITELY NOT buy these Air Force 1 sneakers at a price of \${st.session_state.not_buy_value}")
+                        if go_up():
+                            st.write(
+                                f"You mentioned that you would buy these {st.session_state["sneaker_name"]} sneakers at a price of \${st.session_state.buy_value}")
+                        else:
+                            st.write(
+                                f"You mentioned that you would DEFINITELY NOT buy these {st.session_state["sneaker_name"]} sneakers at a price of \${st.session_state.not_buy_value}")
 
                         placeholder_for_radio = st.empty()
                         # st.write("A check price answer = " + str(st.session_state.check_price_answer))
@@ -289,7 +359,7 @@ if st.session_state["exit_survey"] is None:
                 else:
                     with st.form("Get final maximum price"):
                         st.write(
-                            f"You mentioned that you would not buy these Air Force 1 sneakers at a price of \${st.session_state.not_buy_value} but that you would buy them at a price of \${st.session_state.buy_value}")
+                            f"You mentioned that you would not buy these {st.session_state["sneaker_name"]} sneakers at a price of \${st.session_state.not_buy_value} but that you would buy them at a price of \${st.session_state.buy_value}")
                         maximum_price = st.slider("Q4. What is the maximum price at which you would buy these sneakers?", value = None, min_value = st.session_state["buy_value"], max_value = st.session_state["not_buy_value"], step=1)
                         submit = st.form_submit_button(f"Submit your maximum price")
                         if submit:
