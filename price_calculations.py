@@ -123,11 +123,11 @@ def update_buy_not_buy_price():
     if st.session_state.check_price_answer == "Yes":
         # assign price to low
         st.session_state["buy_value"] = st.session_state.check_price
-        st.write("setting buy value = " + str(st.session_state.check_price))
+        # st.write("setting buy value = " + str(st.session_state.check_price))
     elif st.session_state.check_price_answer == "No":
         # assign price to high
         st.session_state["not_buy_value"] = st.session_state.check_price
-        st.write("setting not buy value = " + str(st.session_state.check_price))
+        # st.write("setting not buy value = " + str(st.session_state.check_price))
     else:
         return
     # st.write("buy_value = ", st.session_state.buy_value)
