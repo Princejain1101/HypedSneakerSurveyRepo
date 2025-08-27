@@ -107,8 +107,6 @@ def go_up():
 
 def buy_question_first():
     if st.session_state["sneaker_image"] is not None and st.session_state["buy_value"] is None:
-        components.html(scroll_script, height=0)
-
         with st.form("Get Buy Value"):
             buy_value = st.number_input("Q1. At what price (in USD) would you DEFINITELY BUY these sneakers?*", value=None, min_value=0, max_value=100000, step=1, placeholder=None)
             never_buy_choice = st.checkbox("Check this box If you would never buy these sneakers whatever its price may be", value=False)
