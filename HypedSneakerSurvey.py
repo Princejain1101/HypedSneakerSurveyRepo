@@ -272,7 +272,6 @@ if st.session_state["exit_survey"] is None:
                     
                     st.rerun()
         if st.session_state["never_buy_future_sneaker"] is not None:
-            components.html(scroll_script, height=0)
 
             sneakerimage = sneaker1nolabel
             st.session_state["sneaker_name"] = st.session_state["sneaker_name1"]
