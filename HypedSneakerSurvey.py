@@ -129,8 +129,6 @@ def buy_question_first():
                 st.session_state["store_buy_value"] = buy_value
                 st.rerun()
     if st.session_state["buy_value"] is not None and st.session_state["not_buy_value"] is None:
-        components.html(scroll_script, height=0)
-
         with st.form("Get Not Buy Value"):
             not_buy_value = st.number_input("Q2. At what price (in USD) would you DEFINITELY NOT BUY these sneakers?*", value=None, min_value=0, max_value=100000,step=1)
             not_buy_value_submitted = st.form_submit_button("please submit your choice")
@@ -140,7 +138,6 @@ def buy_question_first():
             st.rerun()
 def not_buy_question_first():
     if st.session_state["sneaker_image"] is not None and st.session_state["not_buy_value"] is None:
-        components.html(scroll_script, height=0)
 
         with st.form("Get Not Buy Value"):
             not_buy_value = st.number_input("Q1. At what price (in USD) would you DEFINITELY NOT BUY these sneakers?*", value=None, min_value=0, max_value=100000, step=1, placeholder=None)
